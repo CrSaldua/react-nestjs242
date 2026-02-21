@@ -1,7 +1,7 @@
 :root {
-  --bg-dark: #050507;          /* deeper black */
+  --bg-dark: #050507;
   --card-bg: #111116;
-  --primary-violet: #a855f7;   /* stronger purple */
+  --primary-violet: #a855f7;
   --primary-hover: #9333ea;
   --text-bright: #f8fafc;
   --text-dim: #9ca3af;
@@ -9,34 +9,35 @@
   --glow: rgba(168, 85, 247, 0.45);
 }
 
+/* 1. THE CRITICAL FIX: Ensures padding doesn't break widths */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   background: radial-gradient(circle at top, #0b0b12, var(--bg-dark));
   color: var(--text-bright);
   font-family: 'Inter', system-ui, sans-serif;
-
-  /* PERFECT CENTERING */
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* Changed to avoid cutting off content when list is long */
+  padding-top: 5vh; 
+  padding-bottom: 5vh;
   min-height: 100vh;
 }
 
-/* Main wrapper */
 .container {
   width: 100%;
-  max-width: 600px;
+  max-width: 500px; /* Slightly tighter for a cleaner look */
   display: flex;
   flex-direction: column;
-  align-items: center;     /* horizontal center */
-  justify-content: center; /* vertical center */
-  text-align: center;
-  padding: 2rem;
+  align-items: center;
+  padding: 1rem;
 }
 
-/* Title */
 h1 {
-  font-size: 3.5rem;
+  font-size: clamp(2.5rem, 8vw, 3.5rem); /* Responsive size */
   margin-bottom: 0.3rem;
   background: linear-gradient(180deg, #fff, var(--primary-violet));
   -webkit-background-clip: text;
@@ -48,65 +49,71 @@ h1 {
 .subtitle {
   color: var(--text-dim);
   margin-bottom: 2.5rem;
+  font-size: 1rem;
 }
 
-/* Card */
 .card {
   width: 100%;
   background: var(--card-bg);
-  padding: 2.2rem;
-  border-radius: 20px;
+  padding: 2rem;
+  border-radius: 24px;
   border: 1px solid var(--border);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02),
+  box-shadow: 
     0 20px 60px rgba(0,0,0,0.7),
     0 0 30px var(--glow);
   margin-bottom: 2.5rem;
 }
 
-/* Inputs */
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  width: 100%;
 }
 
+/* 2. INPUT FIX: Added text-align left so placeholders look right */
 input, textarea {
   width: 100%;
   background: #0c0c11;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 1rem;
   color: white;
   font-size: 1rem;
   transition: 0.25s;
+  text-align: left; 
+  display: block;
 }
 
 input:focus, textarea:focus {
   outline: none;
   border-color: var(--primary-violet);
   box-shadow: 0 0 18px var(--glow);
+  background: #11111a;
 }
 
-/* Button */
 button {
   width: 100%;
-  padding: 1rem;
+  padding: 1.1rem;
   background: linear-gradient(135deg, var(--primary-violet), #6d28d9);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: 0.25s;
   letter-spacing: 1px;
+  margin-top: 0.5rem;
 }
 
 button:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 0 25px var(--glow);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px var(--glow);
 }
 
-/* Entries */
+button:active {
+  transform: translateY(0);
+}
+
 .entries {
   width: 100%;
   display: flex;
@@ -117,34 +124,35 @@ button:hover {
 .entry-card {
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--border);
-  padding: 1.3rem;
-  border-radius: 16px;
+  padding: 1.5rem;
+  border-radius: 18px;
+  text-align: left; /* Keep messages left-aligned for readability */
   transition: 0.2s;
-  backdrop-filter: blur(6px);
 }
 
 .entry-card:hover {
   border-color: var(--primary-violet);
-  background: rgba(168, 85, 247, 0.08);
-  transform: translateY(-3px);
+  background: rgba(168, 85, 247, 0.05);
 }
 
 .entry-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .entry-header strong {
   color: var(--primary-violet);
+  font-size: 1.05rem;
 }
 
 .date {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-dim);
 }
 
 .entry-message {
-  color: #d1d5db;
+  color: #e2e8f0;
   line-height: 1.6;
+  margin: 0;
 }
