@@ -5,6 +5,8 @@ import './App.css';
 function App() {
   const [entries, setEntries] = useState([]);
   const [form, setForm] = useState({ name: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchEntries = async () => {
     try {
@@ -17,6 +19,8 @@ function App() {
       setEntries(data || []);
     } catch (error) {
       console.error('Failed to fetch entries', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -26,66 +30,87 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const { error } = await supabase
         .from('guestbook')
         .insert([{ name: form.name, message: form.message }]);
+      
       if (error) throw error;
 
       setForm({ name: '', message: '' });
-      fetchEntries();
-      alert('Message signed successfully!');
+      await fetchEntries(); // Refresh list
     } catch (error) {
-      console.error('Failed to save entry', error);
-      alert('Failed to sign guestbook: ' + error.message);
+      alert('Error: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="container">
-      <h1>Guestbook</h1>
+      <header className="app-header">
+        <h1>Guestbook</h1>
+        <p className="subtitle">Leave a message for the community</p>
+      </header>
 
-      <div className="card">
+      <div className="card main-form">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Name</label>
             <input
               type="text"
-              placeholder="Your Name"
+              placeholder="e.g. Jane Doe"
               value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })}
               required
             />
           </div>
           <div className="form-group">
+            <label>Message</label>
             <textarea
-              placeholder="Leave a message..."
+              placeholder="Write something nice..."
               value={form.message}
               onChange={e => setForm({ ...form, message: e.target.value })}
               required
-              rows={3}
+              rows={4}
             />
           </div>
           <div className="actions">
-            <button type="submit">Sign Guestbook</button>
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Signing...' : 'Sign Guestbook'}
+            </button>
           </div>
         </form>
       </div>
 
       <div className="entries">
-        {entries.map(entry => (
-          <div key={entry.id} className="entry-card">
-            <div className="entry-header">
-              <strong>{entry.name}</strong>
-              <span className="date">{new Date(entry.created_at).toLocaleDateString()}</span>
+        <h3>Recent Entries ({entries.length})</h3>
+        {isLoading ? (
+          <div className="loading">Loading messages...</div>
+        ) : entries.length > 0 ? (
+          entries.map(entry => (
+            <div key={entry.id} className="entry-card">
+              <div className="entry-header">
+                <strong>{entry.name}</strong>
+                <span className="date">
+                  {new Date(entry.created_at).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </span>
+              </div>
+              <p className="entry-message">{entry.message}</p>
             </div>
-            <p className="entry-message">{entry.message}</p>
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="empty-state">No messages yet. Be the first to sign!</div>
+        )}
       </div>
     </div>
   );
 }
 
 export default App;
-
